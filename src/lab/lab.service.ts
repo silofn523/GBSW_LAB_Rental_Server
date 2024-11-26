@@ -14,7 +14,7 @@ export class LabService {
     private readonly userService: UserService
   ) {}
 
-  public async createLap(dto: CreateLabDto): Promise<Lab> {
+  public async createLab(dto: CreateLabDto): Promise<Lab> {
     const userId = await this.userService.getOneUser(dto.userId)
 
     if (!userId) {
@@ -23,7 +23,7 @@ export class LabService {
         message: `ID : ${dto.userId}를 가진 해당 유저는 없습니다.`
       })
     }
-    const lap = await this.lab.save({
+    const lab = await this.lab.save({
       rentalDate: dto.rentalDate,
       rentalUser: dto.rentalUser,
       rentalUsers: dto.rentalUsers,
@@ -35,7 +35,7 @@ export class LabService {
       approvalRental: false
     })
 
-    return lap
+    return lab
   }
 
   public async findAll(): Promise<Lab[]> {
@@ -50,7 +50,7 @@ export class LabService {
     })
   }
 
-  public async finDdeletionRental(): Promise<Lab[]> {
+  public async findDeletionRental(): Promise<Lab[]> {
     return await this.lab.find({
       where: {
         deletionRental: false
@@ -58,7 +58,7 @@ export class LabService {
     })
   }
 
-  public async findAllUserLap(id: number): Promise<Lab[]> {
+  public async findAllUserLab(id: number): Promise<Lab[]> {
     return await this.lab.find({
       where: {
         userId: id
@@ -66,7 +66,7 @@ export class LabService {
     })
   }
 
-  public async findOneLap(id: number): Promise<Lab> {
+  public async findOneLab(id: number): Promise<Lab> {
     return await this.lab.findOne({
       where: {
         id
@@ -87,7 +87,7 @@ export class LabService {
   }
 
   public async deleteLap(id: number): Promise<void> {
-    const deletionRental = await this.findOneLap(id)
+    const deletionRental = await this.findOneLab(id)
 
     if (deletionRental.deletionRental == false) {
       throw new NotAcceptableException({

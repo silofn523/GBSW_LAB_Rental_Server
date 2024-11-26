@@ -21,8 +21,8 @@ import { RolesEnum } from 'src/util/enum/roles.enum'
 import { UserService } from 'src/user/user.service'
 import { Lab } from './entities/lab.entity'
 
-@ApiTags('Lap')
-@Controller('lap')
+@ApiTags('Lab')
+@Controller('lab')
 export class LabController {
   constructor(
     private readonly labService: LabService,
@@ -37,14 +37,14 @@ export class LabController {
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBody({ type: CreateLabDto })
   @Post()
-  public async createLap(
+  public async createLab(
     @Body(ValidationPipe) dto: CreateLabDto
   ): Promise<{ success: boolean; ID: number }> {
-    const lap = await this.labService.createLap(dto)
+    const lab = await this.labService.createLab(dto)
 
     return {
       success: true,
-      ID: lap.id
+      ID: lab.id
     }
   }
 
@@ -55,11 +55,11 @@ export class LabController {
   @ApiBearerAuth()
   @Get()
   public async findAll(): Promise<{ success: boolean; body: Lab[] }> {
-    const laps = await this.labService.findAll()
+    const labs = await this.labService.findAll()
 
     return {
       success: true,
-      body: laps
+      body: labs
     }
   }
 
@@ -71,11 +71,11 @@ export class LabController {
   @ApiBearerAuth()
   @Get('approved')
   public async findApprovalRental(): Promise<{ success: boolean; body: Lab[] }> {
-    const laps = await this.labService.findApprovalRental()
+    const labs = await this.labService.findApprovalRental()
 
     return {
       success: true,
-      body: laps
+      body: labs
     }
   }
 
@@ -86,12 +86,12 @@ export class LabController {
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Get('deletion')
-  public async finDdeletionRental(): Promise<{ success: boolean; body: Lab[] }> {
-    const laps = await this.labService.finDdeletionRental()
+  public async findDeletionRental(): Promise<{ success: boolean; body: Lab[] }> {
+    const labs = await this.labService.findDeletionRental()
 
     return {
       success: true,
-      body: laps
+      body: labs
     }
   }
 
@@ -102,9 +102,9 @@ export class LabController {
   @UseGuards(AuthGuard)
   @Get(':id')
   public async findOne(@Param('id') id: number): Promise<{ success: boolean; body: Lab }> {
-    const lap = await this.labService.findOneLap(id)
+    const lab = await this.labService.findOneLab(id)
 
-    if (!lap) {
+    if (!lab) {
       throw new NotFoundException({
         success: false,
         message: `${id}를 가진 대여 요청을 찾지 못했습니다`
@@ -113,7 +113,7 @@ export class LabController {
 
     return {
       success: true,
-      body: lap
+      body: lab
     }
   }
 
@@ -123,7 +123,7 @@ export class LabController {
   @ApiBearerAuth()
   @Get('user/:id')
   @UseGuards(AuthGuard)
-  public async findAllUserBoard(@Param('id') id: number): Promise<Lab[]> {
+  public async findAllUserLab(@Param('id') id: number): Promise<Lab[]> {
     const userId = await this.userService.getOneUser(id)
 
     if (!userId) {
@@ -133,7 +133,7 @@ export class LabController {
       })
     }
 
-    return await this.labService.findAllUserLap(id)
+    return await this.labService.findAllUserLab(id)
   }
 
   @ApiOperation({
@@ -147,9 +147,9 @@ export class LabController {
     @Param('id') id: number,
     @Body(ValidationPipe) dto: UpdateLabDto
   ): Promise<{ success: boolean }> {
-    const lap = await this.labService.findOneLap(id)
+    const lab = await this.labService.findOneLab(id)
 
-    if (!lap) {
+    if (!lab) {
       throw new NotFoundException({
         success: false,
         message: `${id}를 가진 요청을 찾지 못했습니다`
