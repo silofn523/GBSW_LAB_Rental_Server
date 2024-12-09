@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator'
+import { IsDate, IsNotEmpty, IsString } from 'class-validator'
 
 export class CreateLabDto {
   @ApiProperty({
@@ -52,11 +52,11 @@ export class CreateLabDto {
   @IsNotEmpty()
   public readonly labName: string
 
-  @ApiProperty({
-    description: '유저 고유ID',
-    default: '1'
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  public readonly userId: number
+  // @ApiProperty({
+  //   description: '유저 고유ID',
+  //   default: '1'
+  // })
+  // @IsNumber()
+  // @IsNotEmpty()
+  // public readonly userId: number
 }

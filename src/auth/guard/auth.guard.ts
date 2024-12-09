@@ -1,4 +1,12 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+  UnauthorizedException
+} from '@nestjs/common'
+import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt'
 import * as jwt from 'jsonwebtoken'
 import { RolesEnum } from 'src/util/enum/roles.enum'
 
@@ -6,7 +14,7 @@ import { RolesEnum } from 'src/util/enum/roles.enum'
 export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest()
-    const authHeader = request.headers['authorization']
+    const authHeader = request.headers.authorization
 
     if (!authHeader) {
       throw new UnauthorizedException({
@@ -30,10 +38,20 @@ export class AuthGuard implements CanActivate {
 
       return true
     } catch (e) {
-      throw new UnauthorizedException({
-        success: false,
-        message: `Invalid token : ${e}`
-      })
+      if (e instanceof TokenExpiredError) {
+        throw new NotAcceptableException({
+          success: false,
+          message: `만료된 토큰입니다`
+        })
+      }
+
+      if (e instanceof JsonWebTokenError) {
+        throw new NotAcceptableException({
+          success: false,
+          message: `잘못된 토큰입니다`
+        })
+      }
+      throw new InternalServerErrorException('JWT_SERVICE_ERROR')
     }
   }
 }

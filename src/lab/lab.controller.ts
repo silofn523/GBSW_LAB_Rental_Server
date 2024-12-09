@@ -8,7 +8,8 @@ import {
   ValidationPipe,
   UseGuards,
   NotFoundException,
-  Delete
+  Delete,
+  Headers
 } from '@nestjs/common'
 import { LabService } from './lab.service'
 import { CreateLabDto } from './dto/create-lab.dto'
@@ -38,9 +39,11 @@ export class LabController {
   @ApiBody({ type: CreateLabDto })
   @Post()
   public async createLab(
+    @Headers('authorization') token: string,
     @Body(ValidationPipe) dto: CreateLabDto
   ): Promise<{ success: boolean; ID: number }> {
-    const lab = await this.labService.createLab(dto)
+    token = token.replace('Bearer ', '')
+    const lab = await this.labService.createLab(dto, token)
 
     return {
       success: true,

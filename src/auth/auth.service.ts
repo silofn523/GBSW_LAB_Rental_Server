@@ -1,10 +1,5 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotAcceptableException,
-  UnauthorizedException
-} from '@nestjs/common'
-import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt'
+import { Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { UserService } from 'src/user/user.service'
 import { LoginDto } from './dto/Login.dto'
 import * as bcrypt from 'bcryptjs'
@@ -72,29 +67,12 @@ export class AuthService {
   }
 
   public async verifyToken(token: string): Promise<{ id: number; type: 'access' | 'refresh' }> {
-    try {
-      const decoded = (await this.jwt.verifyAsync(token)) as {
-        id: number
-        type: 'access' | 'refresh'
-      }
-
-      return decoded
-    } catch (e) {
-      if (e instanceof TokenExpiredError) {
-        throw new NotAcceptableException({
-          success: false,
-          message: `만료된 토큰입니다`
-        })
-      }
-
-      if (e instanceof JsonWebTokenError) {
-        throw new NotAcceptableException({
-          success: false,
-          message: `잘못된 토큰입니다`
-        })
-      }
-      throw new InternalServerErrorException('JWT_SERVICE_ERROR')
+    const decoded = (await this.jwt.verifyAsync(token)) as {
+      id: number
+      type: 'access' | 'refresh'
     }
+
+    return decoded
   }
 
   public async rotateToken(

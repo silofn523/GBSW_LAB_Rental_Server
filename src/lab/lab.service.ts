@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Lab } from './entities/lab.entity'
 import { Repository } from 'typeorm'
 import { UserService } from 'src/user/user.service'
+import * as jwt from 'jsonwebtoken'
+import { RolesEnum } from 'src/util/enum/roles.enum'
 
 @Injectable()
 export class LabService {
@@ -14,13 +16,14 @@ export class LabService {
     private readonly userService: UserService
   ) {}
 
-  public async createLab(dto: CreateLabDto): Promise<Lab> {
-    const userId = await this.userService.getOneUser(dto.userId)
+  public async createLab(dto: CreateLabDto, token: string): Promise<Lab> {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as { id: number; role: RolesEnum }
+    const userId = await this.userService.getOneUser(decoded.id)
 
     if (!userId) {
       throw new NotAcceptableException({
         success: false,
-        message: `ID : ${dto.userId}를 가진 해당 유저는 없습니다.`
+        message: `ID : ${decoded.id}를 가진 해당 유저는 없습니다.`
       })
     }
     const lab = await this.lab.save({
@@ -30,7 +33,7 @@ export class LabService {
       rentalPurpose: dto.rentalPurpose,
       rentalStartTime: dto.rentalStartTime,
       labName: dto.labName,
-      userId: dto.userId,
+      userId: decoded.id,
       deletionRental: false,
       approvalRental: false
     })
